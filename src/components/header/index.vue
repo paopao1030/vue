@@ -82,13 +82,11 @@ export default {
           path: "/search",
         });
       } else {
-        this.$router
-          .push({
-            name: "search",
-            query: { name: this.keyworld.toUpperCase() },
-            params: { keyworld: this.keyworld },
-          })
-          .catch(() => {});
+        this.$router.replace({
+          name: "search",
+          query: { name: this.keyworld.toUpperCase() },
+          params: { keyworld: this.keyworld },
+        });
       }
       // this.$router.push({
       //   // path:'/search',
