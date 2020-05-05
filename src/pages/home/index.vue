@@ -1,11 +1,20 @@
 <template>
   <div>
-    我是home组件
+    <TypeNav />
+    <ListContainer />
+    <TodayRecommmend />
   </div>
 </template>
 
 <script>
-export default {};
+import ListContainer from "./ListContainer";
+import TodayRecommmend from "./TodayRecommend";
+export default {
+  components: {
+    ListContainer,
+    TodayRecommmend,
+  },
+};
 </script>
 
 <style></style>
