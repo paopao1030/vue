@@ -1,59 +1,146 @@
 <template>
   <div class="type-nav">
     <div class="container">
-      <h2 class="all">全部商品分类</h2>
-      <nav class="nav">
-        <a href="###">服装城</a>
-        <a href="###">美妆馆</a>
-        <a href="###">尚品汇超市</a>
-        <a href="###">全球购</a>
-        <a href="###">闪购</a>
-        <a href="###">团购</a>
-        <a href="###">有趣</a>
-        <a href="###">秒杀</a>
-      </nav>
-      <div class="sort">
-        <div class="all-sort-list2">
-          <div class="item" v-for="list in newList" :key="list.categoryId">
-            <h3>
-              <a href="">{{ list.categoryName }}</a>
-            </h3>
-            <div class="item-list clearfix">
-              <div class="subitem">
-                <dl
-                  class="fore"
-                  v-for="c2 in list.categoryChild"
-                  :key="c2.categoryId"
+      <div @mouseleave="hideCategory" @mouseenter="showCategory">
+        <h2 class="all">全部商品分类</h2>
+        <transition name="move">
+        <div class="sort" v-show="isShowFirst">
+          <div class="all-sort-list2" @click="toSearch">
+            <div
+              class="item"
+              v-for="(list, index) in newList"
+              :key="list.categoryId"
+              :class="{ item_on: index === currentIndex }"
+              @mouseenter="showSubCategorys(index)"
+            >
+              <h3>
+                <a
+                  href="javascript:"
+                  :data-categoryName="list.categoryName"
+                  :data-category1Id="list.categoryId"
+                  >{{ list.categoryName }}</a
                 >
-                  <dt>
-                    <a href="">{{ c2.categoryName }}</a>
-                  </dt>
-                  <dd>
-                    <em v-for="c3 in c2.categoryChild" :key="c3.categoryId">
-                      <a href="">{{ c3.categoryName }}</a>
-                    </em>
-                  </dd>
-                </dl>
+              </h3>
+              <div class="item-list clearfix">
+                <div class="subitem">
+                  <dl
+                    class="fore"
+                    v-for="c2 in list.categoryChild"
+                    :key="c2.categoryId"
+                  >
+                    <dt>
+                      <a
+                        href="javascript:"
+                        :data-categoryName="c2.categoryName"
+                        :data-category2Id="c2.categoryId"
+                        >{{ c2.categoryName }}</a
+                      >
+                    </dt>
+                    <dd>
+                      <em v-for="c3 in c2.categoryChild" :key="c3.categoryId">
+                        <a
+                          href="javascript:"
+                          :data-categoryName="c3.categoryName"
+                          :data-category3Id="c3.categoryId"
+                          >{{ c3.categoryName }}</a
+                        >
+                      </em>
+                    </dd>
+                  </dl>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        </transition>
       </div>
+      <nav class="nav">
+        <a href="javascript:">服装城</a>
+        <a href="javascript:">美妆馆</a>
+        <a href="javascript:">尚品汇超市</a>
+        <a href="javascript:">全球购</a>
+        <a href="javascript:">闪购</a>
+        <a href="javascript:">团购</a>
+        <a href="javascript:">有趣</a>
+        <a href="javascript:">秒杀</a>
+      </nav>
     </div>
   </div>
 </template>
 
 <script>
+import throttle from "lodash/throttle";
 import { mapState } from "vuex";
 export default {
+  name: "TypeNav",
+
+  data() {
+    return {
+      // -2: 代表完全在整个div外面  -1: 代表在大的div中  >=0 代表在分类项小div中
+      currentIndex: -2, // 需要显示子列表的一级分类项的下标
+      isShowFirst: false,
+    };
+  },
+
   computed: {
     ...mapState({
+      // 计算属性值由vuex内部调用此回调函数(传入总state)得到返回值作为属性值
+      // state: store的总状态
       newList: (state) => state.home.baseCategoryList,
     }),
   },
+  created() {
+    this.isShowFirst = this.$route.path === "/";
+  },
   mounted() {
     // 通过异步action获取异步获取数据到vuex的state中
-    this.$store.dispatch("getNewList");
+    this.$store.dispatch("getBaseCategoryList");
+  },
+
+  methods: {
+    showCategory() {
+      this.isShowFirst = true;
+      this.currentIndex = -1;
+    },
+    hideCategory() {
+      this.currentIndex = -2;
+      if (this.$route.path !== "/") {
+        this.isShowFirst = false;
+      }
+    },
+    showSubCategorys: throttle(function(index) {
+      if (this.currentIndex === -2) return; // 如果已经完全移出去了, 不做更新
+      // 更新需要显示子分类的下标
+      this.currentIndex = index;
+      // 会导致列表更新(浏览器在更新过程中没办法去响应后面mouseenter)  ==> 实际上就是界面卡了 不太好
+      // 理想: 不去特别频繁的更新数据(更新界面)   ==> 使用节流
+    }, 200),
+    toSearch(event) {
+      const {
+        categoryname,
+        category1id,
+        category2id,
+        category3id,
+      } = event.target.dataset;
+      // 如何判断点击的分类项<a>
+      if (categoryname) {
+        // 只有所有的分类项的a指定了data-categoryName属性
+        // 准备query参数对象
+        const query = { categoryName: categoryname };
+        if (category1id) {
+          query.category1Id = category1id;
+        } else if (category2id) {
+          query.category2Id = category2id;
+        } else if (category3id) {
+          query.category3Id = category3id;
+        }
+
+        this.$router.push({
+          name: "search",
+          query,
+        });
+      }
+    },
   },
 };
 </script>
@@ -168,7 +255,8 @@ export default {
             }
           }
 
-          &:hover {
+          &.item_on {
+            background: #ccc;
             .item-list {
               display: block;
             }

@@ -1,7 +1,8 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import home from "./modules/home.js";
-import user from "./modules/user.js";
+// import home from "./modules/home.js";
+// import user from "./modules/user.js";
+import aa from "./modules/index.js";
 Vue.use(Vuex);
 const mutations = {
   test2() {
@@ -17,8 +18,9 @@ export default new Vuex.Store({
   mutations,
   actions,
   getters,
-  modules: {
-    home,
-    user,
-  },
+  // modules: {
+  //   home,
+  //   user,
+  // },
+  modules:aa,
 });

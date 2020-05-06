@@ -1,5 +1,6 @@
 <template>
   <div>
+    <TypeNav />
     <h1>我是搜索组件:params为{{ $route.params.keyworld }}</h1>
     <h1>我是搜索组件:query为{{ $route.query.name }}</h1>
     <h2>params=>props={{ keyworld1 }}</h2>
