@@ -62,40 +62,16 @@ export default {
   methods: {
     //编程式导航跳转
     search() {
-      // this.$router.push(
-      //   `/search/${this.keyworld}?name=${this.keyworld.toUpperCase()}`
-      // );
-
-      //如果search传递是空串
-      // 1/字符串形式
       let keyworld = this.keyworld;
-      // if (keyworld === "") {
-      //   this.$router.push("/search");
-      // } else {
-      //   this.$router.push(
-      //     `/search/${this.keyworld}?name=${this.keyworld.toUpperCase()}`
-      //   );
-      // }
-      // 2/对象的形式
-      if (keyworld === "") {
-        this.$router.push({
-          path: "/search",
-        });
-      } else {
-        this.$router.replace({
-          name: "search",
-          query: { name: this.keyworld.toUpperCase() },
-          params: { keyworld: this.keyworld },
-        });
+      const location = {
+        name: "search",
+      };
+      if (keyworld) {
+        location.params = { keyworld };
+        const { query } = this.$route;
+        location.query = query;
+        this.$router.push(location);
       }
-      // this.$router.push({
-      //   // path:'/search',
-      //   //只有query参数时可以使用path
-      //   // name: "search",
-      //   // //如果是params参数则必须用name
-      //   // query: { name: this.keyworld.toUpperCase() },
-      //   // params: { keyworld: this.keyworld },
-      // });
     },
   },
 };

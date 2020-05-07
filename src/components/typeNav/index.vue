@@ -4,54 +4,54 @@
       <div @mouseleave="hideCategory" @mouseenter="showCategory">
         <h2 class="all">全部商品分类</h2>
         <transition name="move">
-        <div class="sort" v-show="isShowFirst">
-          <div class="all-sort-list2" @click="toSearch">
-            <div
-              class="item"
-              v-for="(list, index) in newList"
-              :key="list.categoryId"
-              :class="{ item_on: index === currentIndex }"
-              @mouseenter="showSubCategorys(index)"
-            >
-              <h3>
-                <a
-                  href="javascript:"
-                  :data-categoryName="list.categoryName"
-                  :data-category1Id="list.categoryId"
-                  >{{ list.categoryName }}</a
-                >
-              </h3>
-              <div class="item-list clearfix">
-                <div class="subitem">
-                  <dl
-                    class="fore"
-                    v-for="c2 in list.categoryChild"
-                    :key="c2.categoryId"
+          <div class="sort" v-show="isShowFirst">
+            <div class="all-sort-list2" @click="toSearch">
+              <div
+                class="item"
+                v-for="(list, index) in newList"
+                :key="list.categoryId"
+                :class="{ item_on: index === currentIndex }"
+                @mouseenter="showSubCategorys(index)"
+              >
+                <h3>
+                  <a
+                    href="javascript:"
+                    :data-categoryName="list.categoryName"
+                    :data-category1Id="list.categoryId"
+                    >{{ list.categoryName }}</a
                   >
-                    <dt>
-                      <a
-                        href="javascript:"
-                        :data-categoryName="c2.categoryName"
-                        :data-category2Id="c2.categoryId"
-                        >{{ c2.categoryName }}</a
-                      >
-                    </dt>
-                    <dd>
-                      <em v-for="c3 in c2.categoryChild" :key="c3.categoryId">
+                </h3>
+                <div class="item-list clearfix">
+                  <div class="subitem">
+                    <dl
+                      class="fore"
+                      v-for="c2 in list.categoryChild"
+                      :key="c2.categoryId"
+                    >
+                      <dt>
                         <a
                           href="javascript:"
-                          :data-categoryName="c3.categoryName"
-                          :data-category3Id="c3.categoryId"
-                          >{{ c3.categoryName }}</a
+                          :data-categoryName="c2.categoryName"
+                          :data-category2Id="c2.categoryId"
+                          >{{ c2.categoryName }}</a
                         >
-                      </em>
-                    </dd>
-                  </dl>
+                      </dt>
+                      <dd>
+                        <em v-for="c3 in c2.categoryChild" :key="c3.categoryId">
+                          <a
+                            href="javascript:"
+                            :data-categoryName="c3.categoryName"
+                            :data-category3Id="c3.categoryId"
+                            >{{ c3.categoryName }}</a
+                          >
+                        </em>
+                      </dd>
+                    </dl>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
         </transition>
       </div>
       <nav class="nav">
@@ -92,10 +92,6 @@ export default {
   created() {
     this.isShowFirst = this.$route.path === "/";
   },
-  mounted() {
-    // 通过异步action获取异步获取数据到vuex的state中
-    this.$store.dispatch("getBaseCategoryList");
-  },
 
   methods: {
     showCategory() {
@@ -134,11 +130,17 @@ export default {
         } else if (category3id) {
           query.category3Id = category3id;
         }
-
-        this.$router.push({
+        let location = {
           name: "search",
           query,
-        });
+        };
+        //获取搜索列表的params参数
+        const { keyworld } = this.$route.params;
+        //如果有值,就给准备发的数据里增加
+        if (keyworld) {
+          location.params = { keyworld };
+        }
+        this.$router.push(location);
       }
     },
   },
@@ -185,7 +187,15 @@ export default {
       position: absolute;
       background: #fafafa;
       z-index: 999;
-
+      /* 显示的过渡样式 */
+      &.move-enter-active {
+        transition: all 0.5s;
+      }
+      /* 动画开始前时的样式 */
+      &.move-enter {
+        opacity: 0;
+        height: 0;
+      }
       .all-sort-list2 {
         .item {
           h3 {
