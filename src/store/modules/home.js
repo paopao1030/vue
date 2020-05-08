@@ -1,13 +1,13 @@
 /* 
 用来管理首页数据的vuex模块
 */
-import { reqBaseCategoryList } from "@/api";
+import { reqBaseCategoryList, reqBanners, reqFloors } from "@/api";
 
 export default {
   state: {
     baseCategoryList: [],
-    x: {},
-    y: "",
+    banners: [],
+    floors: [],
   },
 
   mutations: {
@@ -16,6 +16,12 @@ export default {
     */
     RECEIVE_BASE_CATEGORY_LIST(state, baseCategoryList) {
       state.baseCategoryList = baseCategoryList;
+    },
+    RECEIVE_BANNERS(state, banners) {
+      state.banners = banners;
+    },
+    RECEIVE_FLOORS(state, floors) {
+      state.floors = floors;
     },
   },
 
@@ -30,6 +36,25 @@ export default {
       if (result.code === 200) {
         const baseCategoryList = result.data;
         commit("RECEIVE_BASE_CATEGORY_LIST", baseCategoryList);
+      }
+    },
+    //获取轮播图数据
+    async getBanners({ commit }) {
+      // 1. 发异步ajax请求
+      const result = await reqBanners();
+      // 2. 成功后, 提交mutation保存数据
+      if (result.code === 200) {
+        const banners = result.data;
+        commit("RECEIVE_BANNERS", banners);
+      }
+    },
+    async getFloors({ commit }) {
+      // 1. 发异步ajax请求
+      const result = await reqFloors();
+      // 2. 成功后, 提交mutation保存数据
+      if (result.code === 200) {
+        const floors = result.data;
+        commit("RECEIVE_FLOORS", floors);
       }
     },
   },

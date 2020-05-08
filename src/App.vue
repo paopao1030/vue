@@ -14,9 +14,8 @@ import { reqFloors } from "./api/index";
 export default {
   name: "App",
   async mounted() {
-    //测试mock接口数据
-    const result = await reqFloors();
-    console.log(result);
+    this.$store.dispatch("getFloors");
+    this.$store.dispatch("getBanners");
     this.$store.dispatch("getBaseCategoryList");
   },
   components: {
