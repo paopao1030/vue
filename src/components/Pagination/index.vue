@@ -3,12 +3,17 @@
     <!-- 当前页码为1时不能操作 -->
     <button :disabled="myCurrentPage === 1">上一页</button>
     <!-- start要大于1才显示 -->
-    <button v-if="startEnd.start > 1">1</button>
+    <button v-if="startEnd.start > 1" @click="setCurrentPage(1)">1</button>
     <!-- start要大于2才显示 -->
     <button disabled v-if="startEnd.start > 2">···</button>
 
     <!-- 连续页码 [start, end] -->
-    <button v-for="num in startEnd.end" v-if="num < startEnd.start">
+    <button
+      v-for="num in startEnd.end"
+      v-if="num >= startEnd.start"
+      :class="{ active: num === myCurrentPage }"
+      @click="setCurrentPage(num)"
+    >
       {{ num }}
     </button>
     <!-- 
@@ -18,9 +23,19 @@
     <!-- 只有在end小于totalPages-1 -->
     <button disabled v-if="startEnd.end < totalPages - 1">···</button>
     <!-- 只有在end小于totalPages -->
-    <button v-if="startEnd.end < totalPages">{{ totalPages }}</button>
+    <button
+      v-if="startEnd.end < totalPages"
+      @click="setCurrentPage(totalPages)"
+    >
+      {{ totalPages }}
+    </button>
     <!-- 当当前页码为totalPages时不能操作 -->
-    <button :disabled="myCurrentPage === totalPages">下一页</button>
+    <button
+      :disabled="myCurrentPage === totalPages"
+      @click="setCurrentPage(myCurrentPage + 1)"
+    >
+      下一页
+    </button>
 
     <button style="margin-left: 30px" disabled>共 {{ total }} 条</button>
   </div>
@@ -49,6 +64,12 @@ export default {
     showPageNo: {
       type: Number,
       default: 5, // 最好指定为奇数
+    },
+  },
+  watch: {
+    currentPage(value) {
+      console.log("父组件数据改变");
+      this.myCurrentPage = value;
     },
   },
   data() {
@@ -86,7 +107,15 @@ export default {
       console.log(start, end);
     },
   },
-  methods: {},
+  methods: {
+    //设置当前的页码是我点击的页码
+    setCurrentPage (currentPage) {
+        // 一定要是更新自己data中的当前页码, 而不更新接收的currentPage属性
+        this.myCurrentPage = currentPage
+        // 分发vue自定义事件: 通知父组件, 当前页码变化了
+        this.$emit('currentChange', currentPage)
+      }
+  },
 };
 </script>
 

@@ -2,6 +2,7 @@ import Home from "@/pages/home";
 import Search from "@/pages/Search";
 import Register from "@/pages/Register";
 import Login from "@/pages/login";
+import Detail from "@/pages/Detail";
 export default [
   {
     path: "/",
@@ -25,5 +26,9 @@ export default [
     meta: {
       isHideFooter: true,
     },
+  },
+  {
+    path: "/detail/:id",
+    component: Detail,
   },
 ];

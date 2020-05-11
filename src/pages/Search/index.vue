@@ -85,9 +85,9 @@
               >
                 <div class="list-wrap">
                   <div class="p-img">
-                    <a href="javascript:">
+                    <router-link :to="`/detail/${goods.id}`">
                       <img :src="goods.defaultImg" />
-                    </a>
+                    </router-link>
                   </div>
                   <div class="price">
                     <strong>
@@ -96,7 +96,9 @@
                     </strong>
                   </div>
                   <div class="attr">
-                    <a href="javascript:">{{ goods.title }}</a>
+                    <router-link :to="`/detail/${goods.id}`"
+                      >{{ goods.title }}
+                    </router-link>
                   </div>
                   <div class="commit">
                     <i class="command">已有<span>2000</span>人评价</i>
@@ -117,10 +119,11 @@
             </ul>
           </div>
           <Pagination
-           :currentPage="options.pageNo" 
+            :currentPage="options.pageNo"
             :pageSize="options.pageSize"
             :total="productList.total"
             :showPageNo="3"
+            @currentChange="handlCurrentChange"
           />
         </div>
       </div>
@@ -147,7 +150,7 @@ export default {
         // trademark: '', // 品牌  "ID:品牌名称"
         props: [], // 商品属性的数组: ["属性ID:属性值:属性名"] 示例: ["2:6.0～6.24英寸:屏幕尺寸"]
         order: "1:asc", // 排序方式  1: 综合,2: 价格 asc: 升序,desc: 降序  示例: "1:desc"
-        pageNo: 2, // 当前页码
+        pageNo: 1, // 当前页码
         pageSize: 5, // 每页数量
       },
     };
@@ -194,6 +197,12 @@ export default {
   },
 
   methods: {
+    getProductList(pageNo = 1) {
+      // 更新options中的pageNo
+      this.options.pageNo = pageNo;
+      // 再dispatch请求获取
+      this.$store.dispatch("getProductList", this.options);
+    },
     /* 
       当选择改变当前页码时的事件监听回调
       */
@@ -203,7 +212,6 @@ export default {
       // 重新请求获取指定页码的数据显示
       this.$store.dispatch("getProductList", this.options);
     },
-
     /* 
       判断指定flag的排序项是否是当前项
       */
@@ -230,7 +238,7 @@ export default {
       // 设置新的order值
       this.options.order = orderFlag + ":" + orderType;
       // 重新请求显示
-      this.$store.dispatch("getProductList", this.options);
+      this.getProductList();
     },
 
     /* 
@@ -240,7 +248,7 @@ export default {
       // 删除对应的prop
       this.options.props.splice(index, 1);
       // 重新请求数据显示
-      this.$store.dispatch("getProductList", this.options);
+      this.getProductList();
     },
 
     /* 
@@ -258,7 +266,7 @@ export default {
       this.options.props.push(prop);
 
       // 重新请求数据显示
-      this.$store.dispatch("getProductList", this.options);
+      this.getProductList();
     },
 
     /* 
@@ -276,7 +284,7 @@ export default {
       }
 
       // 重新请求获取商品列表显示
-      this.$store.dispatch("getProductList", this.options);
+      this.getProductList();
     },
 
     /* 
