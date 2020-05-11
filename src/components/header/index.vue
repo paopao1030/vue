@@ -36,7 +36,7 @@
             type="text"
             id="autocomplete"
             class="input-error input-xxlarge"
-            v-model="keyworld"
+            v-model="keyword"
           />
           <button
             class="sui-btn btn-xlarge btn-danger"
@@ -55,21 +55,23 @@
 export default {
   data() {
     return {
-      keyworld: "xiajiao",
+      keyword: "",
     };
   },
   name: "Header",
   methods: {
     //编程式导航跳转
     search() {
-      let keyworld = this.keyworld;
+      let keyword = this.keyword;
       const location = {
         name: "search",
       };
-      if (keyworld) {
-        location.params = { keyworld };
-        const { query } = this.$route;
-        location.query = query;
+      const { query } = this.$route;
+      location.query = query;
+      if (keyword === "") {
+        this.$router.push(location);
+      } else {
+        location.params = { keyword };
         this.$router.push(location);
       }
     },

@@ -9,12 +9,8 @@ export default [
   },
   {
     name: "search",
-    path: "/search/:keyworld?",
+    path: "/search/:keyword?",
     component: Search,
-    props: (route) => ({
-      keyworld1: route.params.keyworld,
-      keywold2: route.query.name,
-    }),
   },
   {
     path: "/register",
