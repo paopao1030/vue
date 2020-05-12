@@ -23,3 +23,6 @@ export const reqProductList = (searchParams) =>
   });
 //获取detail信息的请求
 export const reqDeatil = (skuId) => ajax(`/item/${skuId}`);
+//添加购物车的请求
+export const reqAddToCart = (skuId, skuNum) =>
+  ajax.post(`/cart/addToCart/${skuId}/${skuNum}`);

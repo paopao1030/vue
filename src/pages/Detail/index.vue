@@ -79,29 +79,16 @@
           <div class="choose">
             <div class="chooseArea">
               <div class="choosed"></div>
-              <dl>
-                <dt class="title">选择颜色</dt>
-                <dd changepirce="0" class="active">金色</dd>
-                <dd changepirce="40">银色</dd>
-                <dd changepirce="90">黑色</dd>
-              </dl>
-              <dl>
-                <dt class="title">内存容量</dt>
-                <dd changepirce="0" class="active">16G</dd>
-                <dd changepirce="300">64G</dd>
-                <dd changepirce="900">128G</dd>
-                <dd changepirce="1300">256G</dd>
-              </dl>
-              <dl>
-                <dt class="title">选择版本</dt>
-                <dd changepirce="0" class="active">公开版</dd>
-                <dd changepirce="-1000">移动版</dd>
-              </dl>
-              <dl>
-                <dt class="title">购买方式</dt>
-                <dd changepirce="0" class="active">官方标配</dd>
-                <dd changepirce="-240">优惠移动版</dd>
-                <dd changepirce="-390">电信优惠版</dd>
+              <dl v-for="attr in spuSaleAttrList" :key="attr.id">
+                <dt class="title">{{ attr.saleAttrName }}</dt>
+                <dd
+                  v-for="value in attr.spuSaleAttrValueList"
+                  :key="value.id"
+                  :class="{ active: value.isChecked === '1' }"
+                  @click="changeCheked(value, attr.spuSaleAttrValueList)"
+                >
+                  {{ value.saleAttrValueName }}
+                </dd>
               </dl>
             </div>
             <div class="cartWrap">
@@ -111,7 +98,7 @@
                 <a href="javascript:" class="mins">-</a>
               </div>
               <div class="add">
-                <a href="javascript:">加入购物车</a>
+                <a href="javascript:" @click="addtocard">加入购物车</a>
               </div>
             </div>
           </div>
@@ -376,10 +363,30 @@ export default {
     handelCurrentChange(index) {
       this.currentIndex = index;
     },
+    //点击的时候别的改为0，他的isChecked为1
+    changeCheked(value, ValueList) {
+      if (value.isChecked !== "1") {
+        ValueList.forEach((v) => (v.isChecked = "0"));
+        value.isChecked = "1";
+      }
+    },
+    async addtocard() {
+    const result=await  this.$store.dispatch("addToCarta", { skuId: 2});
+    if(result){
+        alert(result)
+    }else{
+        alert('商品添加成功')
+    }
+    },
   },
   computed: {
     ...mapState({ detaiInfo: (state) => state.detail.detailInfo }),
-    ...mapGetters(["categoryView", "skuInfo", "skuImageList"]),
+    ...mapGetters([
+      "categoryView",
+      "skuInfo",
+      "skuImageList",
+      "spuSaleAttrList",
+    ]),
   },
   components: {
     ImageList,
