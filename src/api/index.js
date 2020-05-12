@@ -21,3 +21,5 @@ export const reqProductList = (searchParams) =>
     method: "POST",
     data: searchParams,
   });
+//获取detail信息的请求
+export const reqDeatil = (skuId) => ajax(`/item/${skuId}`);
