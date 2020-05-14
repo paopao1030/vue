@@ -1,9 +1,11 @@
-export default {
+import { getUserTempId } from '@/utils'
+
+export default  {
   state: {
     userInfo: {},
-    x: "",
+    userTempId: getUserTempId()  // 用户临时ID, 获取函数只执行一次
   },
   mutations: {},
-  getters: {},
   actions: {},
-};
+  getters: {},
+}

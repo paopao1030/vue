@@ -26,3 +26,10 @@ export const reqDeatil = (skuId) => ajax(`/item/${skuId}`);
 //添加购物车的请求
 export const reqAddToCart = (skuId, skuNum) =>
   ajax.post(`/cart/addToCart/${skuId}/${skuNum}`);
+//获取购物车列表
+export const reqCartLit = () => ajax("/cart/cartList");
+//把选中的状态更改成选中或者没选中
+export const reqCheckCartItem = (skuId, ischecked) =>
+  ajax(`/cart/checkCart/${skuId}/${ischecked}`);
+//删除商品
+export const removeItem = (skuId) => ajax.delete(`/cart/deleteCart/${skuId}`);

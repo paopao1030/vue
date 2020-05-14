@@ -1,7 +1,7 @@
 /* 
 用来管理detail数据详情的vuex模块
 */
-import { reqDeatil, reqAddToCart } from "@/api";
+import { reqDeatil } from "@/api";
 
 export default {
   state: {
@@ -30,16 +30,7 @@ export default {
         commit("RECEIVE_DETAIL_INFO", reqDeatilList);
       }
     },
-    async addToCarta({ commit }, { skuId, skuNum }) {
-      // 1. 发异步ajax请求
-      const result = await reqAddToCart(skuId, skuNum);
-      // 2. 成功后, 提交mutation保存数据
-      if (result.code === 200) {
-        return "";
-      } else {
-        return "商品添加失败";
-      }
-    },
+    
   },
   getters: {
     categoryView(state) {

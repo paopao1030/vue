@@ -93,9 +93,14 @@
             </div>
             <div class="cartWrap">
               <div class="controls">
-                <input autocomplete="off" class="itxt" />
-                <a href="javascript:" class="plus">+</a>
-                <a href="javascript:" class="mins">-</a>
+                <input autocomplete="off" class="itxt" v-model="skuNum" />
+                <a href="javascript:" class="plus" @click="skuNum++">+</a>
+                <a
+                  href="javascript:"
+                  class="mins"
+                  @click="skuNum > 1 ? skuNum-- : 1"
+                  >-</a
+                >
               </div>
               <div class="add">
                 <a href="javascript:" @click="addtocard">加入购物车</a>
@@ -357,6 +362,7 @@ export default {
   data() {
     return {
       currentIndex: 0,
+      skuNum: 1,
     };
   },
   methods: {
@@ -371,12 +377,22 @@ export default {
       }
     },
     async addtocard() {
-    const result=await  this.$store.dispatch("addToCarta", { skuId: 2});
-    if(result){
-        alert(result)
-    }else{
-        alert('商品添加成功')
-    }
+      const skuId = this.$route.params.id;
+      const skuNum = this.skuNum;
+      //dispatch返回是一个promise
+      const result = await this.$store.dispatch("addToCarta", {
+        skuId,
+        skuNum,
+      });
+      if (result) {
+        alert(result);
+      } else {
+        //商品信息存在seesion里
+        window.sessionStorage.setItem('SKU_INFO_KEY', JSON.stringify(this.skuInfo))
+       //返回没有数据代表请求成功,跳转到成功页面
+       this.$router.push({path:'/addcartsuccess',query: {skuNum}})
+
+      }
     },
   },
   computed: {
