@@ -33,3 +33,14 @@ export const reqCheckCartItem = (skuId, ischecked) =>
   ajax(`/cart/checkCart/${skuId}/${ischecked}`);
 //删除商品
 export const removeItem = (skuId) => ajax.delete(`/cart/deleteCart/${skuId}`);
+//请求注册
+export const reqRegister = (userInfo) =>
+  ajax.post("/user/passport/register", userInfo);
+//请求登录
+export function reqLogout(mobile, password) {
+  return ajax({
+    method: "POST",
+    url: "/user/passport/login",
+    data: { mobile, password },
+  });
+}

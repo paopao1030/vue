@@ -17,11 +17,19 @@
             <form action="##">
               <div class="input-text clearFix">
                 <span></span>
-                <input type="text" placeholder="邮箱/用户名/手机号" />
+                <input
+                  type="text"
+                  placeholder="邮箱/用户名/手机号"
+                  v-model="mobile"
+                />
               </div>
               <div class="input-text clearFix">
                 <span class="pwd"></span>
-                <input type="text" placeholder="请输入密码" />
+                <input
+                  type="text"
+                  placeholder="请输入密码"
+                  v-model="password"
+                />
               </div>
               <div class="setting clearFix">
                 <label class="checkbox inline">
@@ -30,7 +38,9 @@
                 </label>
                 <span class="forget">忘记密码？</span>
               </div>
-              <button class="btn">登&nbsp;&nbsp;录</button>
+              <button class="btn" @click.prevent="loginUser">
+                登&nbsp;&nbsp;录
+              </button>
             </form>
 
             <div class="call clearFix">
@@ -67,7 +77,28 @@
 </template>
 
 <script>
-export default {};
+
+export default {
+  
+  data() {
+    return {
+      password: "",
+      mobile: "",
+    };
+  },
+  methods: {
+    async loginUser() {
+      const { password, mobile } = this;
+      try {
+        await this.$store.dispatch("login", { mobile, password });
+        //成功后跳转到首页
+        this.$router.replace('/')
+      } catch (error) {
+        alert(error.message);
+      }
+    },
+  },
+};
 </script>
 
 <style lang="less" scoped>
@@ -141,7 +172,7 @@ export default {};
               width: 37px;
               height: 32px;
               border: 1px solid #ccc;
-              background: url('../../assets/logo.png') no-repeat -10px -201px;
+              background: url("../../assets/logo.png") no-repeat -10px -201px;
               box-sizing: border-box;
               border-radius: 2px 0 0 2px;
             }

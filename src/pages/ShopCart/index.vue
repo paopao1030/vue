@@ -42,6 +42,13 @@
               :value="item.skuNum"
               minnum="1"
               class="itxt"
+              @change="
+                changeItemNum(
+                  item,
+                  $event.target.value * 1 - item.skuNum,
+                  $event
+                )
+              "
             />
             <a
               href="javascript:void(0)"
@@ -119,13 +126,13 @@ export default {
   },
   methods: {
     //删除已选择的商品
-    async deleteAllItem(){
-        try {
-          this.$store.dispatch('deleteAllCarItem')
-          this.$store.dispatch("getCartList");
-        } catch (error) {
-          alert(error.message)
-        }
+    async deleteAllItem() {
+      try {
+        this.$store.dispatch("deleteAllCarItem");
+        this.$store.dispatch("getCartList");
+      } catch (error) {
+        alert(error.message);
+      }
     },
     // 删除商品
     async deleteOne(id) {
@@ -148,15 +155,21 @@ export default {
       }
     },
     //改变每一个item的数量
-    async changeItemNum(item, numChange) {
-      try {
-        await this.$store.dispatch("addToCarta", {
-          skuId: item.skuId,
-          skuNum: numChange,
-        });
-        this.$store.dispatch("getCartList");
-      } catch (error) {
-        alert(error.message);
+    async changeItemNum(item, numChange, event) {
+      if (numChange + item.skuNum > 0) {
+        try {
+          await this.$store.dispatch("addToCarta", {
+            skuId: item.skuId,
+            skuNum: numChange,
+          });
+          this.$store.dispatch("getCartList");
+        } catch (error) {
+          alert(error.message);
+        }
+      } else {
+        if (event) {
+          event.target.value = item.skuNum;
+        }
       }
     },
   },

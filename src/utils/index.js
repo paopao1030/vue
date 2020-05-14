@@ -16,3 +16,15 @@ export function getUserTempId() {
   // 返回
   return userTempId;
 }
+//将登录用户信息保存到local里
+export function saveUserInfo(userinfo) {
+  localStorage.setItem("USER_INFO_KEY", JSON.stringify(userinfo));
+}
+//读取local里的用户数据
+export function getUserInfo() {
+  return JSON.parse(localStorage.getItem('USER_INFO_KEY'))||{}
+}
+//删除local里的用户数据
+export function deleteInfo(){
+  localStorage.removeItem('USER_INFO_KEY')
+}
