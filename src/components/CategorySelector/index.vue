@@ -3,6 +3,7 @@
     <el-form :inline="true" :model="cForm" class="demo-form-inline">
       <el-form-item label="一级分类">
         <el-select
+          :disabled="disabled"
           v-model="cForm.category1Id"
           placeholder="请选择一级分类"
           @change="handleChange1"
@@ -17,6 +18,7 @@
       </el-form-item>
       <el-form-item label="二级分类">
         <el-select
+          :disabled="disabled"
           v-model="cForm.category2Id"
           placeholder="请选择二级分类"
           @change="handleChange2"
@@ -30,7 +32,12 @@
         </el-select>
       </el-form-item>
       <el-form-item label="三级分类">
-        <el-select v-model="cForm.category3Id" placeholder="请选择三级分类" @change="handleChange3">
+        <el-select
+          v-model="cForm.category3Id"
+          placeholder="请选择三级分类"
+          @change="handleChange3"
+          :disabled="disabled"
+        >
           <el-option
             :label="c3.name"
             :value="c3.id"
@@ -47,6 +54,7 @@
 export default {
   data() {
     return {
+      disabled: false,
       cForm: {
         category1Id: "",
         category2Id: "",
@@ -69,7 +77,7 @@ export default {
       this.category3List = [];
       const result = await this.$API.category.getCategorys2(category1Id);
       this.category2List = result.data;
-      this.$emit('categoryChange',{categoryId:category1Id,level:1})
+      this.$emit("categoryChange", { categoryId: category1Id, level: 1 });
     },
     //二级下拉框的值发生变化
     async handleChange2(category2Id) {
@@ -77,11 +85,11 @@ export default {
       this.category3List = [];
       const result = await this.$API.category.getCategorys3(category2Id);
       this.category3List = result.data;
-      this.$emit('categoryChange',{categoryId:category2Id,level:2})
+      this.$emit("categoryChange", { categoryId: category2Id, level: 2 });
     },
     //三级下拉框的值发生变化，并发送给父组件改变的数据
-    handleChange3(category3Id){
-      this.$emit('categoryChange',{categoryId:category3Id,level:3})
+    handleChange3(category3Id) {
+      this.$emit("categoryChange", { categoryId: category3Id, level: 3 });
     },
     //获取一级列表
     async getCategory1List() {

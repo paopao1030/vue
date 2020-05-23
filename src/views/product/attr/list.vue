@@ -1,6 +1,6 @@
 <template>
   <div>
-    <CategorySelector @categoryChange="handleCategoryChange" />
+    <CategorySelector ref="cs" @categoryChange="handleCategoryChange" />
     <el-card class="box-card">
       <div v-show="isShowList">
         <el-button
@@ -44,12 +44,18 @@
                   size="mini"
                   @click="showUpdata(row)"
                 ></HintButton>
-                <HintButton
-                  title="删除"
-                  type="danger"
-                  icon="el-icon-delete"
-                  size="mini"
-                ></HintButton>
+                <el-popconfirm
+                  :title="`确定要删除${row.attrName}`"
+                  @onConfirm="deleteAttr(row.id)"
+                >
+                  <HintButton
+                    slot="reference"
+                    title="删除"
+                    type="danger"
+                    icon="el-icon-delete"
+                    size="mini"
+                  ></HintButton>
+                </el-popconfirm>
               </template>
             </el-table-column>
           </el-table>
@@ -75,6 +81,7 @@
           <el-table-column label="属性值名称">
             <template slot-scope="{ row, $index }">
               <el-input
+                :ref="$index"
                 v-if="row.edit"
                 v-model="row.valueName"
                 size="mini"
@@ -82,22 +89,34 @@
                 @blur="toShow(row)"
                 @keyup.enter.native="toShow(row)"
               ></el-input>
-              <span v-else @click="toEdit(row)">{{ row.valueName }}</span>
+              <span v-else @click="toEdit(row, $index)">{{
+                row.valueName
+              }}</span>
             </template>
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="{ row, $index }">
-              <HintButton
-                title="删除"
-                type="danger"
-                icon="el-icon-delete"
-                size="mini"
-                @click="attr.attrValueList.splice($index, 1)"
-              ></HintButton>
+              <el-popconfirm
+                :title="`确定要删除${row.valueName}`"
+                @onConfirm="attr.attrValueList.splice($index, 1)"
+              >
+                <HintButton
+                  slot="reference"
+                  title="删除"
+                  type="danger"
+                  icon="el-icon-delete"
+                  size="mini"
+                ></HintButton>
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
-        <el-button type="primary">保存</el-button>
+        <el-button
+          type="primary"
+          @click="save"
+          :disabled="!attr.attrName || attr.attrValueList.length === 0"
+          >保存</el-button
+        >
         <el-button @click="isShowList = true">取消</el-button>
       </div>
     </el-card>
@@ -113,9 +132,43 @@ export default {
     this.getAttrs();
   },
   name: "AttrList",
+  watch: {
+    isShowList(value) {
+      this.$refs.cs.disabled = !value;
+    }
+  },
   methods: {
+    //删除一个属性
+    async deleteAttr(id) {
+      let result = await this.$API.attr.remove(id);
+      if (result.code === 200) {
+        this.getAttrs();
+      } else {
+        this.$message("删除属性失败");
+      }
+    },
+    //添加或者修改属性值
+    async save() {
+      const attr = this.attr;
+      //对传送的数值进行判断
+      attr.attrValueList = attr.attrValueList.filter(item => {
+        return item.valueName !== "" && delete item.edit;
+      });
+      if (attr.attrValueList.length === 0) {
+        this.$message.warning("至少输入一个属性!");
+        return;
+      }
+      let result = await this.$API.attr.addOrUpdate(attr);
+      if (result.code === 200) {
+        this.$message.success("属性保存成功");
+        this.isShowList = true;
+        this.getAttrs();
+      } else {
+        this.$message.error("保存属性失败");
+      }
+    },
     //查看模式改为编辑模式
-    toEdit(value) {
+    toEdit(value, index) {
       // 如果value就已经有edit属性了, 直接指为true
       if (value.hasOwnProperty("edit")) {
         value.edit = true;
@@ -123,6 +176,9 @@ export default {
         // 如果没有, 必须通过$set()来添加一个新属性
         this.$set(value, "edit", true);
       }
+      this.$nextTick(() => {
+        this.$refs[index].focus();
+      });
     },
     //编辑模式失去焦点或者回车改为查看模式
     toShow(value) {
@@ -156,11 +212,15 @@ export default {
       this.attr = attr;
       this.isShowList = false;
     },
-    //添加属性值
+    //添加一个新的属性值
     addAttrValue() {
       this.attr.attrValueList.push({
+        attrId: this.attr.id,
         valueName: "",
         edit: true
+      });
+      this.$nextTick(() => {
+        this.$refs[this.attr.attrValueList.length - 1].focus();
       });
     },
     //子组件三个级别发生变化传回来的参数
@@ -181,6 +241,7 @@ export default {
         this.getAttrs();
       }
     },
+    //获取属性列表
     async getAttrs() {
       const { category1Id, category2Id, category3Id } = this;
       const result = await this.$API.attr.getList(
