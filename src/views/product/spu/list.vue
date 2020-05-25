@@ -1,11 +1,19 @@
 <template>
   <div>
-    <el-card style="margin-bottom: 20px">
-      <category-selector @categoryChange="categoryChange"></category-selector>
+    <el-card style="margin-bottom: 20px" v-show="!isShowSku">
+      <category-selector
+        ref="cs"
+        @categoryChange="categoryChange"
+      ></category-selector>
     </el-card>
     <el-card>
       <div v-show="!isShowSpu && !isShowSku">
-        <el-button type="primary" icon="el-icon-plus" style="margin-bottom:15px"
+        <el-button
+          type="primary"
+          icon="el-icon-plus"
+          style="margin-bottom:15px"
+          @click="showAddSpu"
+          :disabled="!category3Id"
           >添加spu</el-button
         >
         <el-table border :data="spuList">
@@ -17,7 +25,7 @@
           <el-table-column label="操作" width="250">
             <template slot-scope="{ row, $index }">
               <hint-button
-                @click="updateSku(row.index)"
+                @click="showSkuAdd(row)"
                 title="添加SKU"
                 type="primary"
                 icon="el-icon-plus"
@@ -35,6 +43,7 @@
                 type="info"
                 icon="el-icon-info"
                 size="mini"
+                @click="getSkuList(row)"
               ></hint-button>
               <hint-button
                 title="删除SPU"
@@ -57,10 +66,41 @@
           @size-change="handleSizeChange"
         />
       </div>
-      <!-- <spuForm ref="spuform" v-show="isShowSpu" :visible.sync="isShowSpu" /> -->
-      <spu ref="spuform" v-show="isShowSpu" :visible.sync="isShowSpu" />
-      <skuForm v-show="isShowSku" />
+      <spuForm
+        ref="spuform"
+        v-show="isShowSpu"
+        :visible.sync="isShowSpu"
+        @saveSuccess="handelSaveSuccess"
+        @cancel="handelCancel"
+      />
+      <!-- <spu ref="spuform" v-show="isShowSpu" :visible.sync="isShowSpu" /> -->
+      <skuForm
+        ref="skuform"
+        v-show="isShowSku"
+        :saveSuccess="() => (isShowSku = false)"
+        @cancel="isShowSku = false"
+      />
     </el-card>
+    <el-dialog title="收货地址" :visible.sync="isShowSkuList">
+      <el-table :data="skuList">
+        <el-table-column
+          property="skuName"
+          label="名称"
+          width="150"
+        ></el-table-column>
+        <el-table-column
+          property="price"
+          label="价格（元）"
+          width="200"
+        ></el-table-column>
+        <el-table-column property="weight" label="重量（kg）"></el-table-column>
+        <el-table-column label="默认图片">
+          <template slot-scope="{ row, $index }">
+            <img :src="row.skuDefaultImg" style="width:100px;heigth:100px" />
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
@@ -74,6 +114,11 @@ export default {
     spuForm,
     spu
   },
+  watch: {
+    isShowSpu(value) {
+      this.$refs.cs.disabled = value;
+    }
+  },
   data() {
     return {
       isShowSpu: false,
@@ -84,17 +129,63 @@ export default {
       page: 1,
       limit: 3,
       total: 0,
-      spuList: []
+      spuList: [],
+      isShowSkuList: false,
+      spu: {},
+      skuList: []
     };
   },
   mounted() {
-    this.category3Id = 61;
-    this.getSpuList();
+    // this.category1Id = 2;
+    // this.category2Id = 13;
+    // this.category3Id = 61;
+    // this.getSpuList();
   },
   name: "SpuList",
   methods: {
+    //获取当前spu的sku
+    async getSkuList(spu) {
+      this.isShowSkuList = true;
+      this.spu = spu;
+      let result = await this.$API.sku.getListBySpuId(spu.id);
+      if (result.code === 200) {
+        this.skuList = result.data;
+      }
+    },
+    //spu如果保存好了数据
+    handelSaveSuccess() {
+      this.getSpuList(this.spuId ? this.page : 1);
+      this.spuId = null;
+    },
+    //spu取消了返回本页面
+    handelCancel() {
+      this.spuId = null;
+    },
+    /*
+    显示SKU添加的表单界面
+    */
+    showSkuAdd(spu) {
+      this.isShowSku = true;
+
+      spu = { ...spu }; // 对spu进行浅拷贝, 以免更新列表中数据对象
+      spu.category1Id = this.category1Id;
+      spu.category2Id = this.category2Id;
+
+      // 让skuForm去请求加载初始显示需要的数据
+      this.$refs.skuform.initLoadAddData(spu);
+    },
+    /*
+    显示SPU的添加界面
+    */
+    showAddSpu() {
+      // 显示SpuForm修改界面
+      this.isShowSpu = true;
+      // 通知SpuForm请求添加界面初始数据显示
+      this.$refs.spuform.initLoadAddData(this.category3Id);
+    },
     //显示修改spu页面
     updateSpu(spuid) {
+      this.spuId = spuid;
       this.isShowSpu = true;
       this.$refs.spuform.initUpdate(spuid);
     },

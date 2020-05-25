@@ -8,20 +8,19 @@
       ></el-input>
     </el-form-item>
     <el-form-item label="品牌">
-      <el-select v-model="value" placeholder="请选择品牌" value="">
+      <el-select placeholder="请选择品牌" v-model="spuInfo.tmId">
         <el-option
-          v-for="item in trademarkList"
-          :key="item.id"
-          :value="item.tmName"
-        >
-          {{ item.tmName }}</el-option
-        >
+          :label="tm.tmName"
+          :value="tm.id"
+          v-for="tm in trademarkList"
+          :key="tm.id"
+        ></el-option>
       </el-select>
     </el-form-item>
     <el-form-item label="SPU描述">
       <el-input
         type="textarea"
-        placeholder="SPU名称"
+        placeholder="SPU描述"
         rows="4"
         v-model="spuInfo.description"
       ></el-input>
@@ -135,7 +134,6 @@ export default {
   props: ["visible"],
   data() {
     return {
-      value: "长虹",
       dialogImageUrl: "",
       dialogVisible: false,
       spuId: "",
@@ -182,10 +180,33 @@ export default {
       // 成功了, ...
       if (result.code === 200) {
         this.$message.success("保存SPU成功");
+        //重置数据并展现上次看的页码，重新请求页面
+        this.resetDate();
+        this.$emit("update:visible", false);
+        this.$emit("saveSuccess");
       } else {
         // 失败了, 提示
         this.$message.error("保存SPU失败");
       }
+    },
+    //保存后把原本收集的数据清空
+    resetDate() {
+      this.dialogImageUrl = "";
+      this.dialogVisible = false;
+
+      this.spuId = null;
+      this.spuInfo = {
+        category3Id: "",
+        spuName: "",
+        description: "",
+        tmId: "",
+        spuImageList: [],
+        spuSaleAttrList: []
+      };
+      this.spuImageList = [];
+      this.trademarkList = [];
+      this.saleAttrList = [];
+      this.attriDName = "";
     },
     //销售属性值的收集
     handleInputConfirm(spu) {
@@ -245,6 +266,15 @@ export default {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     },
+    //添加spu时展现的需要品牌和销售属性
+      initLoadAddData (category3Id) {
+      // 保存到spuInfo中
+      this.spuInfo.category3Id = category3Id
+      // 3. 获取所有品牌的列表
+      this.getTrademarkList()
+      // 4. 获取所有销售属性(id/name)列表
+      this.getSaleAttrList()
+    },
     //父组件调用的方法,根据请求加载初始化数据
     initUpdate(id) {
       this.spuId = id;
@@ -286,9 +316,11 @@ export default {
       this.saleAttrList = result.data;
     },
 
-    //回到spu列表界面
+    //回到spu列表界面,重置data数据
     back() {
       this.$emit("update:visible", false);
+      this.resetDate();
+      this.$emit("cancel");
     }
   }
 };
