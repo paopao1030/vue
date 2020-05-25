@@ -57,7 +57,8 @@
           @size-change="handleSizeChange"
         />
       </div>
-      <spuForm ref="spuform" v-show="isShowSpu" :visible.sync="isShowSpu" />
+      <!-- <spuForm ref="spuform" v-show="isShowSpu" :visible.sync="isShowSpu" /> -->
+      <spu ref="spuform" v-show="isShowSpu" :visible.sync="isShowSpu" />
       <skuForm v-show="isShowSku" />
     </el-card>
   </div>
@@ -66,10 +67,12 @@
 <script>
 import skuForm from "../components/skuForm";
 import spuForm from "../components/spuForm";
+import spu from "../components/spu";
 export default {
   components: {
     skuForm,
-    spuForm
+    spuForm,
+    spu
   },
   data() {
     return {
