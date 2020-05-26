@@ -66,14 +66,14 @@
           @size-change="handleSizeChange"
         />
       </div>
-      <spuForm
+      <!-- <spuForm
         ref="spuform"
         v-show="isShowSpu"
         :visible.sync="isShowSpu"
         @saveSuccess="handelSaveSuccess"
         @cancel="handelCancel"
-      />
-      <!-- <spu ref="spuform" v-show="isShowSpu" :visible.sync="isShowSpu" /> -->
+      /> -->
+      <spu v-show="isShowSpu" ref="spu" :visible.sync="isShowSpu" />
       <skuForm
         ref="skuform"
         v-show="isShowSku"
@@ -136,10 +136,10 @@ export default {
     };
   },
   mounted() {
-    // this.category1Id = 2;
-    // this.category2Id = 13;
-    // this.category3Id = 61;
-    // this.getSpuList();
+    this.category1Id = 2;
+    this.category2Id = 13;
+    this.category3Id = 61;
+    this.getSpuList();
   },
   name: "SpuList",
   methods: {
@@ -181,13 +181,15 @@ export default {
       // 显示SpuForm修改界面
       this.isShowSpu = true;
       // 通知SpuForm请求添加界面初始数据显示
-      this.$refs.spuform.initLoadAddData(this.category3Id);
+      // this.$refs.spuform.initLoadAddData(this.category3Id);
+      this.$refs.spu.initLoadAddData(this.category3Id);
     },
     //显示修改spu页面
     updateSpu(spuid) {
       this.spuId = spuid;
       this.isShowSpu = true;
-      this.$refs.spuform.initUpdate(spuid);
+      // this.$refs.spuform.initUpdate(spuid);
+      this.$refs.spu.initUpdate(spuid);
     },
     //三级列表传递的值更改父组件的值
     categoryChange({ categoryId, level }) {
